@@ -1,5 +1,12 @@
 # Commands
 
+## basics
+
+```bash
+$ cat /etc/os-release
+to see the os version.
+```
+
 ## Ansible
 
 - [https://www.digitalocean.com/community/cheatsheets/how-to-use-ansible-cheat-sheet-guide](Ansible cheatseat)
