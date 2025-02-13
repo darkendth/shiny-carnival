@@ -1,0 +1,156 @@
+# Locating Applications
+
+- Executable programs and scripts should live in the 
+/bin, /usr/bin, /sbin, /usr/sbin or /opt
+/usr/local/bin, /usr/local/sbin 
+/home/student/bin.
+
+- To locate programs is to employ the *which* utility 
+$ which diff ( where the diff resides)
+- if which does not find the program, *whereis* is a good alternative because it tooks for packages in a broader range of system directories.
+$ whereis diff (as well as locating source and *man* files packaged with the program.
+
+- pushd : show working directories.
+- popd : 
+- cd : switch to previous working directory.
+
+There are two ways to identify paths:
+- *Absolute pathname* : begins with the root directory (/) and follows the tree, branch by branch, until it reaches teh desired directory or file.
+- *Relative pathname* : starts from the present working directory.
+
+	Multiple slashes(/) between directories and files are allowed. ///usr//bin is valid, it seen as just /usr/bin by the system.
+
+	. (present directory), .. (parent directory) and ~ (your home directory).
+
+- *tree* : to get bird's eye view of the filesystem tree. tree -d to view the directories and to suppress listing file names.
+- *df -h* : gives overview of filesystem and size.
+- *ln* : used to create hard links and (with -s option) soft links, also known as symbolic links or symlinks. 
+$ ln file1 file2
+two file now appear to exists,
+$ ls -li file1 file2
+The -i option to ls prints out in the first column the inode number, which is a unique quantity for each file object. This field is same for both of these files; 
+
+Hard links are very useful and they save space, if you remove either file1 or file2; the inode object will remain, which might be undesirable, as it may lead to subtle errors later if you recreate a file of that name.
+If you edit one of the file, what happens depend on your editor, vi and gedit will retain the link by default, but it is possible that modifying one of the name may break the link and result in the creation of two objects.
+
+Soft links are created with -s option
+$ ln -s file1 file3
+file3 no longer appears to be a regular file and it clearly points to file1 and has a different inode number.
+Symbolic links take no extra space on the filesystem (unless their names are very long). They are extremely convenient, as they can easily be modified to point to different places. An easy way to create a shortcut from your home directory to long pathnames is to create a symbolic link
+
+- *pushd* : use to change the directory instead of cd; this pushes your starting directory onto a list. 
+- *popd* : send you back to those directories, walking in reverse order.
+
+## working with files
+- *cat*
+- *tac* : used to look at file backwords starting with the last line.
+- *less* : Used to view larger files because it is a paging program. it pauses at each screen full of text, provides scroll-back capabilities, and lets you search and navigate within the file.
+- *tail* : print last 10 lines of a file. change line using -n option
+- *head*
+- *wc* : word count.
+- *touch* : used to set of update the access, change, and modify times of files.
+	$ touch -t 12091600 myfile 
+	sets timestamp at 4pm, dec 9th 
+	
+	-n option for showing line number.
+
+- *rm -i* : interactively remove a file.
+- *PS1* : variable is the character string that is displayed as the prompt on the command line. You can change,	
+	$ echo $PS1
+	$PS1="\u@\h \$ " 
+	student@r9 $
+	
+## Standard File Streams
+When commands are executed, by default there are three standard file streams (or descriptors) always open for use: standard input (standard in or stdin,0), standard output (standard out or stdout,1) and standard error (or stderr,2).
+
+*I/O Redirection*
+Through the command shell, we can redirect the three standard file streams so that we can get input from either a file or another command, instead of from our keyboard, and we can write output and errors to files or use them to provide input for subsequent commands.
+
+For example, if we have a program called do_something that reads from stdin and writes to stdout and stderr, we can change its input source by using the less-than sign (<) followed by the name of the file to be consumed for input data:
+
+If you want to redirect stderr to a separate file, you use stderr’s file descriptor number (2), the greater-than sign (>), followed by the name of the file you want to receive everything the running command writes to stderr:
+$ do_something < input-file > output-file
+
+$ do_something 2> error-file
+
+A special shorthand notation can send anything written to file descriptor 2 (stderr) to the same place as file descriptor 1 (stdout): 2>&1.
+
+$ do_something > all-output-file 2>&1
+
+bash permits an easier syntax for the above:
+
+$ do_something >& all-output-file
+
+- *locate* : 
+	The locate utility program performs a search while taking advantage of a previously constructed database of files and directories on your system, matching all entries that contain a specified character string. This can sometimes result in a very long list.
+
+To get a shorter (and possibly more relevant) list, we can use the grep program as a filter. grep will print only the lines that contain one or more specified strings, as in: 
+
+$ locate zip | grep bin
+
+locate utilizes a database created by a related utility, updatedb. Most Linux systems run this automatically once a day. However, you can update it at any time by just running updatedb from the command line as the root user.
+
+You can search for a filename containing specific characters using wildcards.
+- ? : matches any single character.
+- * : matches any string of characters.
+- [set] : matches any character in the set of characters, [adf] will match any occurence of a,d, or f.
+- [!set] : matches any character not in the set of characters.
+
+$ ls ba?.out 
+
+*find* 
+It recurses down the filesystem tree from any particular directory (or set of directories) and locates files that match specified conditions. The default pathname is always the present working directory.
+
+Commonly used options to shorten the list include -name (only list files with a certain pattern in their name), -iname (also ignore the case of file names), and -type (which will restrict the results to files of a certain specified type, such as d for directory, l for symbolic link, or f for a regular file, etc.). 
+
+Searching for files and directories named gcc:
+
+$ find /usr -name gcc
+
+Searching only for directories named gcc:
+
+$ find /usr -type d -name gcc
+
+Searching only for regular files named gcc:
+
+$ find /usr -type f -name gcc
+
+Another good use of find is being able to run commands on the files that match your search criteria. The -exec option is used for this purpose.
+
+To find and remove all files that end with .swp:
+
+$ find -name "*.swp" -exec rm {} ’;’
+
+The {} (squiggly brackets) is a placeholder that will be filled with all the file names that result from the find expression, and the preceding command will be run on each one individually.
+
+It is sometimes the case that you wish to find files according to attributes, such as when they were created, last used, etc., or based on their size. It is easy to perform such searches.
+
+To find files based on time:
+
+$ find / -ctime 3
+
+Here, -ctime is when the inode metadata (i.e. file ownership, permissions, etc.) last changed; it is often, but not necessarily, when the file was first created.
+
+To find files based on sizes:
+
+$ find / -size 0
+
+Note the size here is in 512-byte blocks
+
+For example, to find files greater than 10 MB in size and running a command on those files:
+
+$ find / -size +10M -exec command {} ’;’
+
+
+## qpdf
+qpdf --empty --pages 1.pdf 2.pdf -- 12.pdf : Merge the two documents 1.pdf and 2.pdf. The output will be saved to 12.pdf.
+qpdf --empty --pages 1.pdf 1-2 -- new.pdf : Write only pages 1 and 2 of 1.pdf. The output will be saved to new.pdf.
+qpdf --rotate=+90:1 1.pdf 1r.pdf : Rotate page 1 of 1.pdf 90 degrees clockwise and save to 1r.pdf.
+qpdf --rotate=+90:1-z 1.pdf 1r-all.pdf : Rotate all pages of 1.pdf 90 degrees clockwise and save to 1r-all.pdf
+qpdf --encrypt mypw mypw 128 -- public.pdf private.pdf : Encrypt with 128 bits public.pdf using as the passwd mypw with output as private.pdf.
+qpdf --decrypt --password=mypw private.pdf file-decrypted.pdf :	Decrypt private.pdf with output as file-decrypted.pdf.
+
+## pdftk
+pdftk 1.pdf 2.pdf cat output 12.pdf : Merge the two documents 1.pdf and 2.pdf. The output will be saved to 12.pdf.
+pdftk A=1.pdf cat A1-2 output new.pdf : Write only pages 1 and 2 of 1.pdf. The output will be saved to new.pdf.
+pdftk A=1.pdf cat A1-endright output new.pdf : Rotate all pages of 1.pdf 90 degrees clockwise and save result in new.pdf.

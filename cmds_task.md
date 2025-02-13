@@ -168,3 +168,18 @@ $ curl -X POST localhost:8080/admin/schema -d '@schema.graphql'
 upload schema to dgrpah
 
 ```
+
+## Docker
+
+Build image and push to harbour.
+```bash
+$ docker build -t metatop-perf-test .
+
+$ docker login [registryname] -u user_name
+
+$ docker tag metatop-perf-test:latest [registryname]/[repo-name]/metatop-perf-test:latest
+
+$ docker push [registry]/[repo-name]/metatop-perf-test:latest
+```
+
+
