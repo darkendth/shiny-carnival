@@ -7,6 +7,15 @@ $ cat /etc/os-release
 to see the os version.
 ```
 
+## Docker commands
+
+To get the ip address of container to connect.
+
+```bash
+$ docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' dgraph_db
+return ip address.
+```
+
 ## Ansible
 
 - [https://www.digitalocean.com/community/cheatsheets/how-to-use-ansible-cheat-sheet-guide](Ansible cheatseat)

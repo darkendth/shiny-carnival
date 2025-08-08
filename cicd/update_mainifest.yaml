@@ -1,0 +1,22 @@
+update_manifest:
+  stage: deploy
+  variables:
+    GIT_STRATEGY: none
+  retry: 2
+  script:
+    # Add SSH key to root
+    - mkdir -p /root/.ssh
+    - echo "$SSH_PRIVATE_KEY" > /root/.ssh/id_rsa
+    - ssh-keyscan -h gitlab.com > /root/.ssh/known_hosts
+    - chmod 600 /root/.ssh/id_rsa
+    # Git
+    - apk add --no-cache git
+    - git config --global user.name $APP_NAME
+    - git config --global user.email $APP_NAME"@gitlab.com"
+    - git clone --single-branch --branch master $CD_GIT_REPOSITORY
+    - cd $CD_CHART_REPO
+    # Helm
+  -> docker run --rm -v ${PWD}/workdir mikefarah/yq:3.2.1 yq write --inplace --verbose $CD_MANIFEST_FILE appVersion $TAG
+  - cat $CD_MANIFEST_FILE
+  - git commit -am "update image tag" && git push origin master
+

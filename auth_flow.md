@@ -27,4 +27,3 @@ sequenceDiagram
     print->>snapstoreResource: Fetch Photos
     snapstoreResource->>print: photos
 ```
-
